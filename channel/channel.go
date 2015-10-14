@@ -4,26 +4,37 @@ import(
     "net"
 )
 
-type channel struct{
-    id string
-    lateJoiner bool
-    messages []string
-    subscribers []net.Conn
+type Channel struct{
+    Id string
+    LateJoiner bool
+    Messages []string
+    Subscribers []net.Conn
 }
 
-func(c *channel) AddSubscriber(sub net.Conn){
-    c.subscribers[len(c.subscribers)] = sub
-    if c.lateJoiner {
-        buffer := make([]byte, len(c.messages))
-        for i :=0; i < len(c.messages); i++ {
-            buffer[i] = c.messages[i]
+func(c *Channel) AddSubscriber(sub net.Conn){
+    c.Subscribers[len(c.Subscribers)] = sub
+    if c.LateJoiner {
+        buffer := make([]byte, len(c.Messages))
+        for i := 0; i < len(c.Messages); i++ {
+            byteMessage := []byte(c.Messages[i])
+            for j := 0; j < len(byteMessage); j++ {
+                buffer[j] = byteMessage[j]
+            }
+            sub.Write(buffer)
         }
-        sub.Write(buffer)
     }
 }
 
-func(c *channel) Publish(message String){
-    for i := 0; i < len(c.subscribers); i++ {
-        c.subscribers[i].Write(message)
+func(c *Channel) Publish(message string){
+    buffer := make([]byte, len([]byte(message)))
+    byteMessage := []byte(message)
+    for a := 0; a < len(buffer); a++ {
+        buffer[a] = byteMessage[a]
+    }
+    for i := 0; i < len(c.Subscribers); i++ {
+        c.Subscribers[i].Write(buffer)
+    }
+    if c.LateJoiner {
+        c.Messages[len(c.Messages)] = message
     }
 }
