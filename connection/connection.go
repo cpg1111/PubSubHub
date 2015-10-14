@@ -5,10 +5,12 @@ import(
     "github.com/gorilla/websocket"
 )
 
-type connection interface {
-    handleConnection(conn net.Conn, channels map[string]channel.Channel)
+type Incoming struct{
+    MessType string
+    Room string
+    Content string
 }
 
-type wsConnection struct {
-    socket
+type Connection interface {
+    HandleConnection(conn interface{}, rooms map[string]room.Room)
 }
