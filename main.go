@@ -1,20 +1,21 @@
 package main
 
-import(
+import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
-	"io/ioutil"
 	"path/filepath"
-	"encoding/json"
-	"configReader"
-	"connection"
-	"room"
+
+	"github.com/cpg1111/PubSubHub/configReader"
+	"github.com/cpg1111/PubSubHub/connection"
+	"github.com/cpg1111/PubSubHub/room"
 )
 
 func main() {
 	var confPath string
-	if os.GetEnv('DEV') {
+	if os.Getenv("DEV") {
 		confPath = "./config.yml"
 	} else {
 		confPath = "/etc/pubsubhub/config.yml"

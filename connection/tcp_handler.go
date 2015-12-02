@@ -1,36 +1,38 @@
-package connection;
+package connection
 
 import (
-    "net"
-    "encoding/json"
-    "code.google.com/p/go-uuid/uuid"
-    "room"
+	"encoding/json"
+	"net"
+
+	"github.com/cpg1111/PubSubHub/room"
+
+	"code.google.com/p/go-uuid/uuid"
 )
 
 type TcpHandler struct {
-    Connection
+	Connection
 }
 
-func(h *TcpHandler) HandleConnection(conn net.Conn, rooms map[string]room.Room){
-    decoder := json.NewDecoder(conn)
-    for {
-        go func(){
-                incomingMessage := &Incoming{}
-                for {
-                    err := decoder.Decode(incomingMessage)
-                    if err != nil {
-                        panic(err)
-                    }
-                    switch incomingMessage.MessType {
-                    case 'room.create':
-                        id := uuid.New()
-                        rooms[id] := room.New()
-                    case 'room.message':
-                        room.Publish(incomingMessage)
-                    case 'room.destroy':
-                        rooms[incomingMessage.Room] = nil
-                    }
-                }
-            }()
-    }
+func (h *TcpHandler) HandleConnection(conn net.Conn, rooms map[string]room.Room) {
+	decoder := json.NewDecoder(conn)
+	for {
+		go func() {
+			incomingMessage := &Incoming{}
+			for {
+				err := decoder.Decode(incomingMessage)
+				if err != nil {
+					panic(err)
+				}
+				switch incomingMessage.MessType {
+				case "room.create":
+					id := uuid.New()
+					rooms[id] = room.New(id, false) // TODO late joiner option on create
+				case "room.message":
+					room.Publish(incomingMessage)
+				case "room.destroy":
+					rooms[incomingMessage.Room] = nil
+				}
+			}
+		}()
+	}
 }
