@@ -11,29 +11,49 @@ import (
 	"github.com/cpg1111/PubSubHub/configReader"
 	"github.com/cpg1111/PubSubHub/connection"
 	"github.com/cpg1111/PubSubHub/room"
+    "github.com/cpg1111/PubSubHub/data_store/etcd"
+    "github.com/cpg1111/PubSubHub/data_store/redis"
+    "github.com/cpg1111/PubSubHub/data_store/env"
 )
 
-func main() {
-	var confPath string
+func loadConf() *configReader.Config{
+    var confPath string
 	if os.Getenv("DEV") {
 		confPath = "./config.yml"
 	} else {
 		confPath = "/etc/pubsubhub/config.yml"
 	}
-	PATH_TO_CONFIG, pathErr := filepath.abs(confPath)
+	pathToConfig, pathErr := filepath.abs(confPath)
 	alt_conf_path = os.GetEnv("PSH_CONF_PATH")
 	if alt_conf_path != nil {
-		PATH_TO_CONFIG = filepath.abs(alt_conf_path)
+		pathToConfig = filepath.abs(alt_conf_path)
 	}
 	if pathErr != nil {
 		panic(pathErr)
 	}
-	conf := config{}
-	conf.defaults()
-	confFile, err := ioutil.ReadFile(PATH_TO_CONFIG)
-	yamlErr := yaml.Unmarshal([]byte(data), &t)
+	conf := configReader.New()
+	confFile, err := ioutil.ReadFile(pathToConfig)
+	yamlErr := yaml.Unmarshal([]byte(data), &conf)
 	if yamlErr != nil {
-		log.Fatal(yamlErr)
+		panic(yamlErr)
 	}
+    conf.defaults()
+    return conf
+}
 
+func main() {
+    conf := loadConf()
+    var dataConn *interface{} // I hate this, but if anyone has any alternatives, I'd love to hear them
+    switch conf.DataStore {
+    case "etcd":
+        dataConn = etcd.New(conf)
+    case "redis":
+        dataConn = redis.New(conf)
+    default:
+        dataConn = env_loader.New()
+    }
+    masterEndPoint, mEPErr := dataConn.Get("MASTER_ENDPOINT")
+    if mpErr != nil {
+        panic(mpErr)
+    }
 }

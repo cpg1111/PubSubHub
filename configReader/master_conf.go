@@ -2,23 +2,23 @@ package configReader
 
 type MasterConf struct {
 	defaultConfig
-	isWorker   bool
-	protocol   string
-	backend    string
-	pubSubPort int
+	IsWorker   bool
+	Protocol   string
+	Backend    string
+	PubSubPort int
 }
 
-func (master *MasterConf) defaults() {
-	if master.isWorker == nil {
-		master.isWorker = false
+func (master *MasterConf) Defaults() {
+	if master.IsWorker == nil {
+		master.IsWorker = false
 	}
-	if master.protocol == nil {
-		master.protocol = "ws"
+	if master.Protocol == nil {
+		master.Protocol = "ws"
 	}
-	if master.backend == nil {
-		master.backend = "native"
+	if master.Backend == nil {
+		master.Backend = "native"
 	}
-	if master.pubSubPort == nil {
-		master.pubSubPort = 8080
+	if master.PubSubPort == nil {
+		master.PubSubPort = 8080
 	}
 }

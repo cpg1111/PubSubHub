@@ -5,22 +5,29 @@ import (
 )
 
 type defaultConfig interface {
-	defaults()
+	Defaults()
 }
 
-type config struct {
+type Config struct {
 	defaultConfig
-	master     MasterConf
-	minWorkers int
-	maxWorkers int
+	Master     MasterConf
+	MinWorkers int
+	MaxWorkers int
+    DataStore string
+    EtcdEndPoints []string
+    RedisAddress string
 }
 
-func (conf *config) defaults() {
-	conf.master.defaults()
-	if conf.minWorkers == nil {
-		conf.minWorkers = 1
+func (conf *config) Defaults() {
+	conf.Master.Defaults()
+	if conf.MinWorkers == nil {
+		conf.MinWorkers = 1
 	}
-	if conf.maxWorkers == nil {
-		conf.maxWorkers = 5
+	if conf.MaxWorkers == nil {
+		conf.MaxWorkers = 5
 	}
+}
+
+func New() *Config{
+    return &Config{}
 }
