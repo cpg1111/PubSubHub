@@ -6,6 +6,7 @@ type MasterConf struct {
 	Protocol   string
 	Backend    string
 	PubSubPort int
+    MasterPort int
 }
 
 func (master *MasterConf) Defaults() {

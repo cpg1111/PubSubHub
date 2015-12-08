@@ -10,7 +10,7 @@ type WSHandler struct {
 	Connection
 }
 
-func (h *WSHandler) HandleConnection(conn websocket.Conn, rooms map[string]room.Room) {
+func (h *WSHandler) HandleConnection(conn websocket.Conn, rooms map[string]room.Channel) {
 	decoder := json.NewDecoder(conn)
 	for {
 		go func() {

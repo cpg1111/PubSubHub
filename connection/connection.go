@@ -1,8 +1,9 @@
 package connection
 
 import (
-	"github.com/gorilla/websocket"
 	"net"
+
+    "github.com/cpg1111/PubSubHub/room"
 )
 
 type Incoming struct {
@@ -12,5 +13,15 @@ type Incoming struct {
 }
 
 type Connection interface {
-	HandleConnection(conn interface{}, rooms map[string]room.Room)
+    NewRoom(isMaster bool, createMessage Incoming{}) room.Channel
+	HandleConnection(conn *interface{}, rooms *map[string]room.Channel)
+}
+
+func New(connType, target string) *interface{}, *Connection {
+    var conn *Connection
+    switch connType {
+    case "TCP":
+        conn = &TcpHandler{}
+        l, lErr := net.Listen("tcp", target)
+    }
 }
