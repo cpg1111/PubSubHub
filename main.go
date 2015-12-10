@@ -39,7 +39,7 @@ func loadConf() *configReader.Config{
     return conf
 }
 
-func setupMasterConn(isMaster bool, masterEndPoint string) connection.Connection, *map[string]room.Channel{
+func setupMasterConn(isMaster bool, masterEndPoint string, dataConn *data_store.DataStore) connection.Connection, *map[string]room.Channel{
     var rooms map[string]room.Channel
     masterConn := connection.NewTCP()
     if isMaster {
@@ -47,9 +47,8 @@ func setupMasterConn(isMaster bool, masterEndPoint string) connection.Connection
         masterConn.Serve(masterEndPoint, &rooms)
     }
     masterConn.Connect(masterEndPoint)
-    if !isMaster {
-        masterConn.GetRooms()
-    }
+    rooms = room.GetRooms(dataConn)
+    return masterConn, rooms
 }
 
 func main() {
@@ -64,15 +63,15 @@ func main() {
     default:
         dataConn = data_store.NewEnvLoader()
     }
-    masterEndPoint, mEPErr := dataConn.Get("MASTER_ENDPOINT")
+    masterEndPoint, mEPErr := dataConn.Get("MASTER_ENDPOINT")["MASTER_ENDPOINT"]
     if mpErr != nil {
         panic(mpErr)
     }
     hostEndPoint := net.JoinHostPort(hostIp, string(conf.MasterPort))
     if masterEndPoint == nil {
         dataConn.Set("MASTER_ENDPOINT", hostEndPoint)
-        masterEndPoint = dataConn.Get("MASTER_ENDPOINT")
+        masterEndPoint = dataConn.Get("MASTER_ENDPOINT")["MASTER_ENDPOINT"]
     }
     isMaster := (hostEndPoint == masterEndPoint)
-    setupMasterConn(isMaster, dataConn)
+    masterConn, rooms := setupMasterConn(isMaster, dataConn)
 }

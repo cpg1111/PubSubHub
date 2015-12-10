@@ -1,4 +1,4 @@
-package data_store
+package env
 
 import (
     "os"
@@ -12,13 +12,11 @@ func(e *EnvLoader) Set(key, value string){
     // TODO
     // Once PSH master to worker communication is worked out
     // This should tell the master to have all workers set an Env variable to a value
-    envErr := os.Setenv(key, value)
-    if envErr != nil {
-        panic(envErr)
-    }
+    env[key] = value
+    os.Setenv(key, value)
 }
 
-func(e .EnvLoader) Get(key string) string{
+func(e .EnvLoader) Get(key string) map[string]interface{} {
     var value string
     if e.Env[key] != "" || e.Env[key] != nil {
         value = e.Env[key]
@@ -26,9 +24,7 @@ func(e .EnvLoader) Get(key string) string{
         value = os.Getenv(key)
         e.Env[key] = os.Getenv
     }
-    return value
-}
-
-func NewEnvLoader() *EnvLoader{
-    return &EnvLoader{}
+    resMap := make(map[string]interface{})
+    resMap[key] = value
+    return resMap
 }

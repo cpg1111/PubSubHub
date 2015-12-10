@@ -19,12 +19,14 @@ func(r *Redis) SetupConn(conf *configReader.Config){
     r.Conn = conn
 }
 
-func(r *Redis) Get(key string) string{
+func(r *Redis) Get(key string) map[string]interface{} {
     res, resErr := r.Conn.Get(key)
     if resErr != nil {
         panic(nil)
     }
-    return string(res)
+    resMap := make(map[string]interface{})
+    resMap[key] = string(res)
+    return resMap
 }
 
 func(r *Redis) Set(key, value string){
